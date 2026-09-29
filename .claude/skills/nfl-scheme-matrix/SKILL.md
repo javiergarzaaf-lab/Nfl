@@ -40,7 +40,7 @@ pip install -e ".[dev]"
 
 ## Quick Start
 
-### View Scheme Rankings
+### View Scheme Rankings (Current & Historical)
 
 ```bash
 # Show all teams' scheme matrix for the current week
@@ -48,6 +48,7 @@ nfl-model best-bets > report.md
 
 # Specify a season and week
 nfl-model best-bets --season 2025 --week 1 > report.md
+nfl-model best-bets --season 2024 --week 10 > historical_report.md
 
 # Limit to top matchups (e.g., 10 highest-leverage schemes)
 nfl-model best-bets --limit 10 > report.md
@@ -56,14 +57,15 @@ nfl-model best-bets --limit 10 > report.md
 nfl-model best-bets --out scheme_report.json
 ```
 
-### Export Full Scheme Matrix
+### Export Full Scheme Matrix (Current & Historical)
 
 ```bash
 # Full JSON schema payload for all teams this week
 nfl-model export > scheme_export.json
 
-# Specify season/week
-nfl-model export --season 2025 --week 1 --out scheme_export.json
+# Specify past season/week for historical comparison
+nfl-model export --season 2024 --week 5 --out historical_scheme.json
+nfl-model export --season 2023 --week 1 --out 2023_w1_scheme.json
 ```
 
 ### View Authority & Model Status
@@ -71,6 +73,93 @@ nfl-model export --season 2025 --week 1 --out scheme_export.json
 ```bash
 # Check RESEARCH_ONLY gate and unmet production requirements
 nfl-model status
+```
+
+---
+
+## Historical Data & Past Results (NEW)
+
+### Get Past Week Results & Standings
+
+**Using nfl-data skill (ESPN + nflverse):**
+
+```bash
+# Get scoreboard for a specific week in the past
+sports-skills nfl get_scoreboard --week=3 --season=2025
+
+# Get final standings for a season
+sports-skills nfl get_standings --season=2024
+sports-skills nfl get_standings --season=2023
+
+# Get team schedule (includes results once played)
+sports-skills nfl get_team_schedule --team=KC --season=2025
+
+# Get specific game stats/box score
+sports-skills nfl get_game_stats --game_id=<espn_game_id>
+```
+
+### Get Play-By-Play & EPA History
+
+```bash
+# Get detailed play-by-play for a specific game
+sports-skills nfl get_play_by_play --game_id=<game_id> --week=3 --season=2025
+
+# Get weekly team stats (EPA, yards, turnovers, etc.)
+sports-skills nfl get_nflverse_team_stats --season=2024
+sports-skills nfl get_nflverse_team_stats --season=2023
+
+# Get player stats by week
+sports-skills nfl get_nflverse_player_stats --season=2025 --week=3
+```
+
+### Head-to-Head Historical Matchups
+
+```bash
+# Using nfl-matchup-scout with multiple historical seasons:
+python -m nfl_scout KC BUF --seasons 2023 2024 2025
+
+# This generates splits across 3 seasons showing:
+# - How KC offense historically performs vs BUF defense
+# - How BUF offense historically performs vs KC defense
+# - Trends across years (improving/declining matchups)
+# - Personnel/formation/coverage consistency
+```
+
+### Compare Team Scheme Changes Over Time
+
+```bash
+# Export multiple seasons for a team
+nfl-model export --season 2023 --out 2023_full_scheme.json
+nfl-model export --season 2024 --out 2024_full_scheme.json
+nfl-model export --season 2025 --out 2025_full_scheme.json
+
+# Then compare:
+# - Personnel distribution changes (more 11 vs 12?)
+# - Coverage preferences (more man, less zone?)
+# - Pressure rates (blitz more aggressive?)
+# - Coaching/coordinator changes reflected in scheme
+```
+
+### Use Case: Predicting Week 4 Using Historical Momentum
+
+**Example: NE Patriots for Week 4**
+
+```bash
+# 1. Get recent results
+sports-skills nfl get_scoreboard --week=3 --season=2025
+# → See that NE lost to BUF 27-20 in Week 2
+
+# 2. Get EPA trends across weeks 1-3
+sports-skills nfl get_nflverse_team_stats --season=2025 --weeks=1,2,3
+# → See NE pass EPA declining: +0.18 (W1) → -0.15 (W2) → -0.21 (W3)
+
+# 3. Compare to historical (2024) same time
+sports-skills nfl get_nflverse_team_stats --season=2024 --weeks=1,2,3
+# → See if NE's 2025 slump is normal or abnormal
+
+# 4. Run scheme matrix for Week 4
+nfl-model best-bets --season 2025 --week 4 --limit 5
+# → Factor in momentum: NE's pass EPA trend will downgrade their rating
 ```
 
 ## Scheme Matrix Dimensions

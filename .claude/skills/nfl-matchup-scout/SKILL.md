@@ -34,11 +34,27 @@ which python && python --version  # requires Python 3.8+
 
 ## Quick Start
 
+### Current Season Analysis
+
 Generate a Markdown report comparing two teams:
 
 ```bash
-python -m nfl_scout KC LV --seasons 2025 2026 > report.md
-python -m nfl_scout SF GB --seasons 2024 2025 > report.md
+python -m nfl_scout KC LV --seasons 2025 > current_report.md
+```
+
+### Historical Head-to-Head (Multiple Seasons)
+
+Compare matchups across years to identify **consistent trends**:
+
+```bash
+# 3-year history (2023-2025)
+python -m nfl_scout KC LV --seasons 2023 2024 2025 > 3yr_history.md
+
+# 5-year history
+python -m nfl_scout SF GB --seasons 2021 2022 2023 2024 2025 > 5yr_history.md
+
+# Shows if KC has ALWAYS struggled vs LV's defense or if it's recent
+# Identifies coaching changes, personnel changes, scheme consistency
 ```
 
 Launch an interactive Streamlit dashboard:
